@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/eatmoreapple/openwechat"
 	"github.com/qingconglaixueit/wechatbot/config"
+	"github.com/qingconglaixueit/wechatbot/dreamstudio"
 	"github.com/qingconglaixueit/wechatbot/gpt"
 	"github.com/qingconglaixueit/wechatbot/pkg/logger"
 	"github.com/qingconglaixueit/wechatbot/service"
@@ -36,6 +38,7 @@ func UserMessageContextHandler() func(ctx *openwechat.MessageContext) {
 
 		// 处理用户消息
 		err = handler.handle()
+
 		if err != nil {
 			logger.Warning(fmt.Sprintf("handle user message error: %s", err))
 		}
@@ -60,10 +63,57 @@ func NewUserMessageHandler(message *openwechat.Message) (MessageHandlerInterface
 
 // handle 处理消息
 func (h *UserMessageHandler) handle() error {
+	//如果是文本前四个字 = "生成图片"
+	if strings.HasPrefix(h.msg.Content, "生成图片") {
+		return h.ReplyImage()
+	}
+	//如果是纯文本，使用ChatGPT进行回复
 	if h.msg.IsText() {
 		return h.ReplyText()
 	}
 	return nil
+}
+
+// ReplyImage 发送生成的图片
+func (h *UserMessageHandler) ReplyImage() error {
+	if time.Now().Unix()-h.msg.CreateTime > 60 {
+		return nil
+	}
+
+	maxInt := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(5)
+	time.Sleep(time.Duration(maxInt+1) * time.Second)
+
+	log.Printf("Received User[%v], Content[%v], CreateTime[%v]", h.sender.NickName, h.msg.Content,
+		time.Unix(h.msg.CreateTime, 0).Format("2006/01/02 15:04:05"))
+
+	var (
+		replyPath string
+		err       error
+	)
+	// 1.生成图片
+	text := strings.Replace(h.msg.Content, "生成图片", "", -1)
+	replyPath, err = dreamstudio.TextToImage(text)
+
+	if err != nil {
+		text := err.Error()
+		if strings.Contains(err.Error(), "context deadline exceeded") {
+			text = deadlineExceededText
+		}
+		_, err = h.msg.ReplyText(text)
+		if err != nil {
+			return fmt.Errorf("reply user error: %v ", err)
+		}
+		return err
+	}
+
+	//2.回复图片
+	img, _ := os.Open(replyPath)
+	defer img.Close()
+	_, err = h.msg.ReplyImage(img)
+	if err != nil {
+		return fmt.Errorf("reply user error: %v ", err)
+	}
+	return err
 }
 
 // ReplyText 发送文本消息到群
