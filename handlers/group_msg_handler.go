@@ -243,10 +243,13 @@ func (g *GroupMessageHandler) buildReplyText(reply string) string {
 	}
 
 	// 2.拼接回复, @我的用户, 问题, 回复
-	replaceText := "@" + g.self.NickName
-	question := strings.TrimSpace(strings.ReplaceAll(g.msg.Content, replaceText, ""))
-	hr := strings.Repeat("-", 36)
-	reply = atText + "\n" + question + "\n" + hr + "\n" + reply
+	// replaceText := "@" + g.self.NickName
+	// question := strings.TrimSpace(strings.ReplaceAll(g.msg.Content, replaceText, ""))
+	// hr := strings.Repeat("-", 36)
+	//reply = atText + "\n" + question + "\n" + hr + "\n" + reply
+
+	//回复中去除  问题和横线
+	reply = atText + "\n" + reply
 	reply = strings.Trim(reply, "\n")
 
 	// 3.返回回复的内容
