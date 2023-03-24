@@ -97,7 +97,7 @@ func TextToImage(msg string) (string, error) {
 
 	// Write the images to disk
 	for i, image := range body.Images {
-		outFile := fmt.Sprintf("./dreamstudio/v1_txt2img_%d.png", i)
+		outFile := fmt.Sprintf("v1_txt2img_%d.png", i)
 		file, err := os.Create(outFile)
 		if err != nil {
 			log.Printf("picture create error: %v", err)
@@ -116,5 +116,5 @@ func TextToImage(msg string) (string, error) {
 			log.Printf("picture close error: %v", err)
 		}
 	}
-	return "./dreamstudio/v1_txt2img_0.png", nil
+	return "v1_txt2img_0.png", nil
 }

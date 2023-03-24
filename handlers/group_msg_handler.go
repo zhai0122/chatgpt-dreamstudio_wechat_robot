@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/eatmoreapple/openwechat"
+	"github.com/qingconglaixueit/wechatbot/config"
 	"github.com/qingconglaixueit/wechatbot/dreamstudio"
 	"github.com/qingconglaixueit/wechatbot/gpt"
 	"github.com/qingconglaixueit/wechatbot/pkg/logger"
@@ -75,8 +76,9 @@ func NewGroupMessageHandler(msg *openwechat.Message) (MessageHandlerInterface, e
 
 // handle 处理消息
 func (g *GroupMessageHandler) handle() error {
-	//如果是文本中包含 "生成图片"
-	if strings.Contains(g.msg.Content, "生成图片") {
+	cfg := config.LoadConfig()
+	// 判断文本前缀是PictureToken，例如："生成图片"
+	if strings.Contains(g.msg.Content, cfg.PictureToken) {
 		return g.ReplyImage()
 	}
 	//如果是纯文本，使用ChatGPT进行回复
@@ -107,7 +109,8 @@ func (g *GroupMessageHandler) ReplyImage() error {
 		return nil
 	}
 	// 2.整理数据
-	text := strings.ReplaceAll(g.msg.Content, "生成图片", "")
+	cfg := config.LoadConfig()
+	text := strings.ReplaceAll(g.msg.Content, cfg.PictureToken, "")
 	replaceText := "@" + g.self.NickName
 	text = strings.ReplaceAll(text, replaceText, "")
 	if text == "" {

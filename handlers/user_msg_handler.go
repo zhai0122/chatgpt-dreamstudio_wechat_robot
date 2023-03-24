@@ -63,8 +63,9 @@ func NewUserMessageHandler(message *openwechat.Message) (MessageHandlerInterface
 
 // handle 处理消息
 func (h *UserMessageHandler) handle() error {
-	//如果是文本前四个字 = "生成图片"
-	if strings.HasPrefix(h.msg.Content, "生成图片") {
+	cfg := config.LoadConfig()
+	//判断文本前缀是PictureToken，例如："生成图片"
+	if strings.HasPrefix(h.msg.Content, cfg.PictureToken) {
 		return h.ReplyImage()
 	}
 	//如果是纯文本，使用ChatGPT进行回复
@@ -90,8 +91,9 @@ func (h *UserMessageHandler) ReplyImage() error {
 		replyPath string
 		err       error
 	)
+	cfg := config.LoadConfig()
 	// 1.生成图片
-	text := strings.Replace(h.msg.Content, "生成图片", "", -1)
+	text := strings.Replace(h.msg.Content, cfg.PictureToken, "", -1)
 	replyPath, err = dreamstudio.TextToImage(text)
 
 	if err != nil {
