@@ -48,10 +48,10 @@ type ChatGPTRequestBody struct {
 }
 
 // Completions gtp文本模型回复
-//curl https://api.openai.com/v1/completions
-//-H "Content-Type: application/json"
-//-H "Authorization: Bearer your chatGPT key"
-//-d '{"model": "text-davinci-003", "prompt": "give me good song", "temperature": 0, "max_tokens": 7}'
+// curl https://api.openai.com/v1/completions
+// -H "Content-Type: application/json"
+// -H "Authorization: Bearer your chatGPT key"
+// -d '{"model": "text-davinci-003", "prompt": "give me good song", "temperature": 0, "max_tokens": 7}'
 func Completions(msg string) (string, error) {
 	var gptResponseBody *ChatGPTResponseBody
 	var resErr error
@@ -80,8 +80,8 @@ func Completions(msg string) (string, error) {
 
 func httpRequestCompletions(msg string, runtimes int) (*ChatGPTResponseBody, error) {
 	cfg := config.LoadConfig()
-	if cfg.ApiKey == "" {
-		return nil, errors.New("api key required")
+	if cfg.GPTApiKey == "" {
+		return nil, errors.New("GPT api key required")
 	}
 
 	requestBody := ChatGPTRequestBody{
@@ -106,7 +106,7 @@ func httpRequestCompletions(msg string, runtimes int) (*ChatGPTResponseBody, err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+cfg.ApiKey)
+	req.Header.Set("Authorization", "Bearer "+cfg.GPTApiKey)
 	client := &http.Client{Timeout: 15 * time.Second}
 	response, err := client.Do(req)
 	if err != nil {
