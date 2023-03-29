@@ -17,6 +17,10 @@ type Configuration struct {
 	GPTApiKey string `json:"gpt_api_key"`
 	// 自动通过好友
 	AutoPass bool `json:"auto_pass"`
+	// 是否通过代理
+	Proxy bool `json:"proxy"`
+	// 代理地址
+	ProxyUrl string `json:"proxy_url"`
 	// 会话超时时间
 	SessionTimeout time.Duration `json:"session_timeout"`
 	// GPT请求最大字符数
@@ -56,6 +60,8 @@ func LoadConfig() *Configuration {
 		config = &Configuration{
 			AutoPass:          false,
 			SessionTimeout:    60,
+			Proxy:             false,
+			ProxyUrl:          "http://localhost:1080",
 			MaxTokens:         512,
 			Model:             "text-davinci-003",
 			Temperature:       0.9,
@@ -87,6 +93,8 @@ func LoadConfig() *Configuration {
 		// 有环境变量使用环境变量
 		GPTApiKey := os.Getenv("GPTAPIKEY")
 		AutoPass := os.Getenv("AUTO_PASS")
+		Proxy := os.Getenv("PROXY")
+		ProxyUrl := os.Getenv("PROXY_URL")
 		SessionTimeout := os.Getenv("SESSION_TIMEOUT")
 		Model := os.Getenv("MODEL")
 		MaxTokens := os.Getenv("MAX_TOKENS")
@@ -106,6 +114,12 @@ func LoadConfig() *Configuration {
 		}
 		if AutoPass == "true" {
 			config.AutoPass = true
+		}
+		if Proxy == "true" {
+			config.Proxy = true
+		}
+		if ProxyUrl != "" {
+			config.ProxyUrl = ProxyUrl
 		}
 		if SessionTimeout != "" {
 			duration, err := time.ParseDuration(SessionTimeout)

@@ -1,6 +1,8 @@
 {
   "gpt_api_key": "you gpt_api_key",
   "auto_pass": true,
+  "proxy": false,
+  "Proxy_url": "http://localhost:1080",
   "session_timeout": 60,
   "max_tokens": 1024,
   "model": "gpt-3.5-turbo",
