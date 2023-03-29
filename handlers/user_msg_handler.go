@@ -14,6 +14,7 @@ import (
 	"github.com/qingconglaixueit/wechatbot/gpt"
 	"github.com/qingconglaixueit/wechatbot/pkg/logger"
 	"github.com/qingconglaixueit/wechatbot/service"
+	"github.com/sashabaranov/go-openai"
 )
 
 var _ MessageHandlerInterface = (*UserMessageHandler)(nil)
@@ -136,13 +137,13 @@ func (h *UserMessageHandler) ReplyText() error {
 	)
 	// 1.获取上下文，如果字符串为空不处理
 	requestText := h.getRequestText()
-	if requestText == "" {
+	if len(requestText) == 0 {
 		log.Println("user message is empty")
 		return nil
 	}
 
 	// 2.向GPT发起请求，如果回复文本等于空,不回复
-	reply, err = gpt.Completions(h.getRequestText())
+	reply, err = gpt.Chat(h.getRequestText())
 	if err != nil {
 		text := err.Error()
 		if strings.Contains(err.Error(), "context deadline exceeded") {
@@ -167,30 +168,37 @@ func (h *UserMessageHandler) ReplyText() error {
 }
 
 // getRequestText 获取请求接口的文本，要做一些清晰
-func (h *UserMessageHandler) getRequestText() string {
+func (h *UserMessageHandler) getRequestText() []openai.ChatCompletionMessage {
 	// 1.去除空格以及换行
 	requestText := strings.TrimSpace(h.msg.Content)
 	requestText = strings.Trim(h.msg.Content, "\n")
+	if len(requestText) == 0 {
+		log.Println("user message is empty")
+		sessionText := make([]openai.ChatCompletionMessage, 0)
+		return sessionText
+	}
 
-	// 2.获取上下文，拼接在一起，如果字符长度超出4000，截取为4000。（GPT按字符长度算），达芬奇3最大为4068，也许后续为了适应要动态进行判断。
+	// 2.获取上下文，拼接在一起，
 	sessionText := h.service.GetUserSessionContext()
-	if sessionText != "" {
-		requestText = sessionText + "\n" + requestText
+	if sessionText != nil {
+		sessionText = append(sessionText, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: requestText,
+		})
+	} else {
+		sessionText = make([]openai.ChatCompletionMessage, 0)
+		sessionText = append(sessionText, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: requestText,
+		})
 	}
-	if len(requestText) >= 4000 {
-		requestText = requestText[:4000]
-	}
+	// 判断结构体数组总长度目前还不太会写
+	// if len(requestText) >= 4000 {
+	// 	requestText = requestText[:4000]
+	// }
 
-	// 3.检查用户发送文本是否包含结束标点符号
-	punctuation := ",.;!?，。！？、…"
-	runeRequestText := []rune(requestText)
-	lastChar := string(runeRequestText[len(runeRequestText)-1:])
-	if strings.Index(punctuation, lastChar) < 0 {
-		requestText = requestText + "？" // 判断最后字符是否加了标点，没有的话加上句号，避免openai自动补齐引起混乱。
-	}
-
-	// 4.返回请求文本
-	return requestText
+	// 3.返回请求文本
+	return sessionText
 }
 
 // buildUserReply 构建用户回复

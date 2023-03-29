@@ -14,6 +14,7 @@ import (
 	"github.com/qingconglaixueit/wechatbot/gpt"
 	"github.com/qingconglaixueit/wechatbot/pkg/logger"
 	"github.com/qingconglaixueit/wechatbot/service"
+	"github.com/sashabaranov/go-openai"
 )
 
 var _ MessageHandlerInterface = (*GroupMessageHandler)(nil)
@@ -164,13 +165,13 @@ func (g *GroupMessageHandler) ReplyText() error {
 
 	// 2.获取请求的文本，如果为空字符串不处理
 	requestText := g.getRequestText()
-	if requestText == "" {
-		log.Println("group message is empty")
+	if requestText == nil {
+		log.Println("user message is empty")
 		return nil
 	}
 
 	// 3.请求GPT获取回复
-	reply, err = gpt.Completions(requestText)
+	reply, err = gpt.Chat(requestText)
 	if err != nil {
 		text := err.Error()
 		if strings.Contains(err.Error(), "context deadline exceeded") {
@@ -195,37 +196,42 @@ func (g *GroupMessageHandler) ReplyText() error {
 }
 
 // getRequestText 获取请求接口的文本，要做一些清洗
-func (g *GroupMessageHandler) getRequestText() string {
+func (g *GroupMessageHandler) getRequestText() []openai.ChatCompletionMessage {
 	// 1.去除空格以及换行
 	requestText := strings.TrimSpace(g.msg.Content)
 	requestText = strings.Trim(g.msg.Content, "\n")
+	if len(requestText) == 0 {
+		log.Println("user message is empty")
+		sessionText := make([]openai.ChatCompletionMessage, 0)
+		return sessionText
+	}
 
 	// 2.替换掉当前用户名称
 	replaceText := "@" + g.self.NickName
 	requestText = strings.TrimSpace(strings.ReplaceAll(g.msg.Content, replaceText, ""))
-	if requestText == "" {
-		return ""
+	if len(requestText) == 0 {
+		log.Println("user message is empty")
+		sessionText := make([]openai.ChatCompletionMessage, 0)
+		return sessionText
 	}
 
-	// 3.获取上下文拼接在一起,如果字符长度超出4000截取为4000(GPT按字符长度算),达芬奇3最大为4068,也许后续为了适应要动态进行判断
+	// 3.获取上下文，拼接在一起，
 	sessionText := g.service.GetUserSessionContext()
-	if sessionText != "" {
-		requestText = sessionText + "\n" + requestText
-	}
-	if len(requestText) >= 4000 {
-		requestText = requestText[:4000]
-	}
-
-	// 4.检查用户发送文本是否包含结束标点符号
-	punctuation := ",.;!?，。！？、…"
-	runeRequestText := []rune(requestText)
-	lastChar := string(runeRequestText[len(runeRequestText)-1:])
-	if strings.Index(punctuation, lastChar) < 0 {
-		requestText = requestText + "？" // 判断最后字符是否加了标点,没有的话加上句号,避免openai自动补齐引起混乱
+	if sessionText != nil {
+		sessionText = append(sessionText, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: requestText,
+		})
+	} else {
+		sessionText = make([]openai.ChatCompletionMessage, 0)
+		sessionText = append(sessionText, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: requestText,
+		})
 	}
 
 	// 5.返回请求文本
-	return requestText
+	return sessionText
 }
 
 // buildReply 构建回复文本
@@ -241,12 +247,6 @@ func (g *GroupMessageHandler) buildReplyText(reply string) string {
 	if reply == "" {
 		return atText + " " + deadlineExceededText
 	}
-
-	// 2.拼接回复, @我的用户, 问题, 回复
-	// replaceText := "@" + g.self.NickName
-	// question := strings.TrimSpace(strings.ReplaceAll(g.msg.Content, replaceText, ""))
-	// hr := strings.Repeat("-", 36)
-	//reply = atText + "\n" + question + "\n" + hr + "\n" + reply
 
 	//回复中去除  问题和横线
 	reply = atText + "\n" + reply

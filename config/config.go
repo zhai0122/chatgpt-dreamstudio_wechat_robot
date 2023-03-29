@@ -20,11 +20,11 @@ type Configuration struct {
 	// 会话超时时间
 	SessionTimeout time.Duration `json:"session_timeout"`
 	// GPT请求最大字符数
-	MaxTokens uint `json:"max_tokens"`
+	MaxTokens int `json:"max_tokens"`
 	// GPT模型
 	Model string `json:"model"`
 	// 热度
-	Temperature float64 `json:"temperature"`
+	Temperature float32 `json:"temperature"`
 	// 回复前缀
 	ReplyPrefix string `json:"reply_prefix"`
 	// 清空会话口令
@@ -124,15 +124,15 @@ func LoadConfig() *Configuration {
 				logger.Danger(fmt.Sprintf("config max tokens error: %v ,get is %v", err, MaxTokens))
 				return
 			}
-			config.MaxTokens = uint(max)
+			config.MaxTokens = int(max)
 		}
 		if Temperature != "" {
-			temp, err := strconv.ParseFloat(Temperature, 64)
+			temp, err := strconv.ParseFloat(Temperature, 32)
 			if err != nil {
 				logger.Danger(fmt.Sprintf("config temperature error: %v, get is %v", err, Temperature))
 				return
 			}
-			config.Temperature = temp
+			config.Temperature = float32(temp)
 		}
 		if ReplyPrefix != "" {
 			config.ReplyPrefix = ReplyPrefix

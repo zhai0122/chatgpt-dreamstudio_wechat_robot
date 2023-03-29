@@ -8,6 +8,7 @@
 ### 实现功能
 
 * GPT机器人模型热度可配置
+* 支持gpt3.5,gpt4模型
 * 提问增加上下文&指令清空上下文
 * DreamStudio图像生成模型参数可配置
 * 可设定图像生成触发指令
@@ -112,7 +113,7 @@ $ exit
   "auto_pass": true,
   "session_timeout": 60,
   "max_tokens": 1024,
-  "model": "text-davinci-003",
+  "model": "gpt-3.5-turbo",
   "temperature": 1,
   "reply_prefix": "来自机器人回复：",
   "session_clear_token": "我要问下一个问题了",
@@ -134,7 +135,7 @@ $ exit
 "auto_pass":# 是否自动通过好友添加
   "session_timeout": 60,            # 会话超时时间，默认60秒，单位秒，在会话时间内所有发送给机器人的信息会作为上下文
   "max_tokens": 1024,               # GPT响应字符数，最大2048，默认值512。会影响接口响应速度，字符越大响应越慢
-  "model": "text-davinci-003",      # GPT选用模型，默认text-davinci-003，具体选项参考官网训练场
+  "model": "gpt-3.5-turbo",      # GPT选用模型，默认gpt-3.5-turbo，具体选项参考官网训练场
   "temperature": 1,                 # GPT热度，0到1，默认0.9，数字越大创造力越强，但更偏离训练事实，越低越接近训练事实
   "reply_prefix": "来自机器人回复：", # 私聊回复前缀
   "session_clear_token": "清空会话"  # 会话清空口令，默认`下个问题`
@@ -227,4 +228,4 @@ https://link.zhihu.com/?target=https%3A//github.com/Maks-s/sd-akashic
 ### 友情提示
 
 本项目是 fork 他人的项目来进行学习和使用，请勿商用，可以下载下来做自定义的功能。
-项目基于[eatmoreapple](https://github.com/eatmoreapple)/**[openwechat](https://github.com/eatmoreapple/openwechat)** 、[ZYallers](https://github.com/ZYallers)/**[chatgpt_wechat_robot](https://github.com/ZYallers/chatgpt_wechat_robot)** 、[qingconglaixueit](https://github.com/qingconglaixueit)/**[wechatbot](https://github.com/qingconglaixueit/wechatbot)**开发。
+项目基于[eatmoreapple](https://github.com/eatmoreapple)/**[openwechat](https://github.com/eatmoreapple/openwechat)** 、[ZYallers](https://github.com/ZYallers)/**[chatgpt_wechat_robot](https://github.com/ZYallers/chatgpt_wechat_robot)** 、[qingconglaixueit](https://github.com/qingconglaixueit)/**[wechatbot](https://github.com/qingconglaixueit/wechatbot)**开发。  
