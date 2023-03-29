@@ -49,7 +49,7 @@ func (s *UserService) GetUserSessionContext() []openai.ChatCompletionMessage {
 
 	// 2.如果对话超过等于50次，强制清空会话（超过GPT会报错）。
 	contextText := sessionContext.([]openai.ChatCompletionMessage)
-	if len(contextText) >= 50 {
+	if len(contextText) >= 100 {
 		s.cache.Delete(s.user.ID())
 	}
 

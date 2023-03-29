@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"net/http"
-	"net/url"
 
 	"github.com/qingconglaixueit/wechatbot/config"
 	"github.com/sashabaranov/go-openai"
@@ -17,22 +15,21 @@ func Chat(msg []openai.ChatCompletionMessage) (string, error) {
 		log.Printf("GPT api key required\n")
 		return "", errors.New("GPT api key required")
 	}
-
-	config := openai.DefaultConfig(cfg.GPTApiKey)
-	proxyUrl, err := url.Parse("http://localhost:1080")
-	if err != nil {
-		panic(err)
-	}
-	transport := &http.Transport{
-		Proxy: http.ProxyURL(proxyUrl),
-	}
-	config.HTTPClient = &http.Client{
-		Transport: transport,
-	}
-	client := openai.NewClientWithConfig(config)
-
+	//代理
+	// config := openai.DefaultConfig(cfg.GPTApiKey)
+	// proxyUrl, err := url.Parse("http://localhost:1080")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// transport := &http.Transport{
+	// 	Proxy: http.ProxyURL(proxyUrl),
+	// }
+	// config.HTTPClient = &http.Client{
+	// 	Transport: transport,
+	// }
+	// client := openai.NewClientWithConfig(config)
 	log.Printf("Request already send")
-	//client := openai.NewClient("cfg.GPTApiKey")
+	client := openai.NewClient(cfg.GPTApiKey)
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
