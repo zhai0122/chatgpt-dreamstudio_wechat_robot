@@ -79,7 +79,9 @@ $ docker run -itd --name wechatbot --restart=always \
  -e GPTAPIKEY=换成你的GPT key \
  -e AUTO_PASS=false \
  -e SESSION_TIMEOUT=60s \
- -e MODEL=text-davinci-003 \
+ -e PROXY_URL=false\
+ -e PROXY_URL=http://localhost:1080\
+ -e MODEL=gpt-3.5-turbo \
  -e MAX_TOKENS=512 \
  -e TEMPREATURE=0.9 \
  -e REPLY_PREFIX=我是来自机器人回复: \
@@ -112,7 +114,7 @@ $ exit
   "gpt_api_key": "你的gpt api key",
   "auto_pass": true,
   "proxy": false,
-  "Proxy_url": "http://localhost:1080",
+  "proxy_url": "http://localhost:1080",
   "session_timeout": 60,
   "max_tokens": 1024,
   "model": "gpt-3.5-turbo",
@@ -136,7 +138,7 @@ $ exit
 "gpt_api_key":						# openai账号里设置的api_key
 "auto_pass":# 是否自动通过好友添加
 "proxy": false,#是否添加代理
-  "Proxy_url": "http://localhost:1080",#代理的地址和端口
+  "proxy_url": "http://localhost:1080",#代理的地址和端口
   "session_timeout": 60,            # 会话超时时间，默认60秒，单位秒，在会话时间内所有发送给机器人的信息会作为上下文
   "max_tokens": 1024,               # GPT响应字符数，最大2048，默认值512。会影响接口响应速度，字符越大响应越慢
   "model": "gpt-3.5-turbo",      # GPT选用模型，默认gpt-3.5-turbo，具体选项参考官网训练场
