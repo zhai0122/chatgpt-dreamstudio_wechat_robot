@@ -6,7 +6,7 @@ import (
 	"github.com/eatmoreapple/openwechat"
 	"github.com/patrickmn/go-cache"
 	"github.com/qingconglaixueit/wechatbot/config"
-	"github.com/sashabaranov/go-openai"
+	"github.com/zhai0122/go-openai"
 )
 
 // UserServiceInterface 用户业务接口

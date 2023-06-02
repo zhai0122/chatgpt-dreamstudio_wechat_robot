@@ -14,7 +14,7 @@ import (
 	"github.com/qingconglaixueit/wechatbot/gpt"
 	"github.com/qingconglaixueit/wechatbot/pkg/logger"
 	"github.com/qingconglaixueit/wechatbot/service"
-	"github.com/sashabaranov/go-openai"
+	"github.com/zhai0122/go-openai"
 )
 
 var _ MessageHandlerInterface = (*GroupMessageHandler)(nil)

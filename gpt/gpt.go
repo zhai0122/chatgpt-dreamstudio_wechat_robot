@@ -8,7 +8,7 @@ import (
 	"net/url"
 
 	"github.com/qingconglaixueit/wechatbot/config"
-	"github.com/sashabaranov/go-openai"
+	"github.com/zhai0122/go-openai"
 )
 
 func Chat(msg []openai.ChatCompletionMessage) (string, error) {
